@@ -1,0 +1,68 @@
+import json
+import requests
+import discord
+from discord.ext import commands
+
+client = commands.Bot(command_prefix = '.')
+
+@client.event
+async def on_ready():
+  await client.change_presence(activity=discord.Game('temp very sexy'))
+  print('bot ready wtf?')
+
+@client.command()
+async def userinfo(ctx):
+    user = ctx.author
+
+    embed=discord.Embed(title="USER INFO", description=f"Here is the info we retrieved about {user}", colour=user.colour)
+    embed.set_thumbnail(url=user.avatar_url)
+    embed.add_field(name="NAME", value=user.name, inline=True)
+    embed.add_field(name="NICKNAME", value=user.nick, inline=True)
+    embed.add_field(name="ID", value=user.id, inline=True)
+    embed.add_field(name="STATUS", value=user.status, inline=True)
+    embed.add_field(name="TOP ROLE", value=user.top_role.name, inline=True)
+    await ctx.send(embed=embed)
+ 
+@client.command()
+async def rouser(ctx, username):
+ 
+    carros_json=requests.get(f"https://api.roblox.com/users/get-by-username?username={username}")
+    carros=json.loads(carros_json.text)
+    test = (carros["Id"])
+    #image
+    carro_json2=requests.get(f"https://users.roblox.com/v1/users/{test}/status")
+    carro2=json.loads(carro_json2.text)
+    test2 = (carro2["status"])
+ 
+    #display
+    displayname2=requests.get(f"https://users.roblox.com/v1/users/{test}")
+    displayname3=json.loads(displayname2.text)
+    displayname4 = (displayname3["displayName"])
+    #created
+    date1=requests.get(f"https://users.roblox.com/v1/users/{test}")
+    date2=json.loads(date1.text)
+    date3 = (date2["created"])
+    #image
+    im1=requests.get(f"https://thumbnails.roblox.com/v1/users/avatar-headshot?userIds={test}&size=100x100&format=Png&isCircular=false")
+    im2=json.loads(im1.text)
+    im3 = (im2['data'][0]['imageUrl'])
+    
+    #description
+    desc1=requests.get(f"https://users.roblox.com/v1/users/{test}")
+    desc2=json.loads(desc1.text)
+    desc3 = (desc2["description"])
+
+  
+
+    embed=discord.Embed(title=f"{username}", url=f"https://www.roblox.com/users/{test}/profile", color=0x00b3ff)
+    embed.set_author(name="user sniped")
+    embed.set_footer(text="temp")
+    embed.add_field(name="Status", value=f"{test2}", inline=False)
+    embed.add_field(name="id", value=f"{test}", inline=False)
+    embed.add_field(name="Displayname", value=f"{displayname4}", inline=True)
+    embed.add_field(name="created", value=f"{date3}", inline=False)
+    embed.add_field(name="description", value=f"{desc3}", inline=True)
+    embed.set_thumbnail(url=f"{im3}")
+    await ctx.send(embed=embed)
+
+client.run('ODg3NDQ5MjE2NzQwMzgwNjkz.YUETfQ.j0JuDn_3Kv8_LDunTd_bsGwMT0A')
